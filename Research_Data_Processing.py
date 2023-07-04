@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
 import pandas as pd
 
 
@@ -54,18 +53,17 @@ class Treatment:
         """
         Clean the data by getting rid of large outlying data values. This can be done by indicating what protein staining was conducted.
         """
-        if Treatment.DEFAULT_DATA_INDICATION[0] in treatment_name:
-            pass
-        elif Treatment.DEFAULT_DATA_INDICATION[1] in treatment_name:
-            pass
+        if Treatment.DEFAULT_DATA_INDICATION[0:2] in treatment_name:
+            self.dataset.drop(self.datset[self.dataset['Area'] > 1000].index)
         elif Treatment.DEFAULT_DATA_INDICATION[2] in treatment_name:
-            pass
+            self.dataset.drop(self.datset[self.dataset['Area'] > 2000].index)
         else:
             while True:
                 new_name_input = input("Give new name to data file to include either 'RFP Nucleus', 'GFP Nucleus', or 'RFP Cytoplasm.' ")
                 if any(word in new_name_input for word in Treatment.DEFAULT_DATA_INDICATION):
                     self.name = new_name_input
                     break
+
 
 
     def print_df(self):
