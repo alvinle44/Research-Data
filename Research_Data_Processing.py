@@ -10,7 +10,7 @@ class Treatment:
     DEFAULT_MIN_LETTERS = 4
     DEFAULT_MAX_LETTERS = 30
     DEFAULT_NAME = "Unnamed"
-    DEFAULT_TREATMENTS = None
+    DEFAULT_TREATMENTS = []
     DEFAULT_DATA_INDICATION = ["RFP Nucleus", "GFP Nucleus", "RFP Cytoplasm"]
 
 
@@ -18,7 +18,7 @@ class Treatment:
     def __init__(self) -> None:
         self.dataset = self.DEFAULT_DATASET
         self.name = self.DEFAULT_NAME
-        self.treatement = self.DEFAULT_TREATMENTS
+        self.treatment = self.DEFAULT_TREATMENTS
     
 
     @property
@@ -36,20 +36,36 @@ class Treatment:
 
 
     def process_file(self, filename):
+        """
+        This method is able to read in the csv file as a pandas dataframe.
+        This process is able to extract all the treatments that were conducted in the experiment.
+        """
         try:
             df = pd.read_csv(filename).dropna()
-            print(df)
         except FileNotFoundError:
             return False
-        self.datset = df
+        self.dataset = df
+        treatments = self.dataset['Treatment'].unique()
+        for treatment in treatments:
+            self.treatment.append(treatment)
         return True
 
     def clean_data(self, treatment_name):
         """
         Clean the data by getting rid of large outlying data values. This can be done by indicating what protein staining was conducted.
-        This process also is able to extract all the treatments that were conducted in the experiment.
         """
-        pass
+        if Treatment.DEFAULT_DATA_INDICATION[0] in treatment_name:
+            pass
+        elif Treatment.DEFAULT_DATA_INDICATION[1] in treatment_name:
+            pass
+        elif Treatment.DEFAULT_DATA_INDICATION[2] in treatment_name:
+            pass
+        else:
+            while True:
+                new_name_input = input("Give new name to data file to include either 'RFP Nucleus', 'GFP Nucleus', or 'RFP Cytoplasm.' ")
+                if any(word in new_name_input for word in Treatment.DEFAULT_DATA_INDICATION):
+                    self.name = new_name_input
+                    break
 
 
     def print_df(self):
@@ -61,7 +77,7 @@ def abstract_data(filename):
         while True:
             try:
                 new_name = input("Give dataset a name between 4 - 30 charachters." 
-                                 "Include what protein staining(GFP nuclues, RFP nucleus, or RFP cytoplams). ")
+                                 "Include what protein staining(GFP nucleus, RFP nucleus, or RFP cytoplams). ")
                 filename.name = new_name
                 break
             except ValueError:
@@ -71,9 +87,45 @@ def abstract_data(filename):
         return False
 
 
+def print_menu():
+    print("\nMain Menu\n"
+          "1 - Process a new data file\n"
+          "2 - Print Data Chart/Image\n"
+          "3 - Retrieve Data\n"
+          "4 - Quit\n")
+    
+def print_treatments(datafile):
+    print(datafile.treatment)
+
+
 def main():
+    #instantiate a new varible to the class Treatment
     new_set = Treatment()
-    abstract_data(new_set)
+    while True:
+    #loads the menu selection about what data can be abstracted
+        print_menu()
+        try:
+    #input for choices
+            menu_choice = int(input("What is your choice? "))
+        except ValueError:
+            print("***Input Number Values Only!")
+        if menu_choice == 1:
+            abstract_data(new_set)
+        elif menu_choice == 2:
+            print_treatments(new_set)
+        elif menu_choice == 3:
+            pass
+        elif menu_choice == 4:
+            pass
+        elif menu_choice == 5:
+            pass
+        elif menu_choice == 6:
+            pass
+        elif menu_choice == 7:
+            break
+        else:
+            print("Invalid Choice, please enter an integer between 1 and 7.\n")
+
 
 if __name__ == "__main__":
     """Call on function main."""
@@ -85,11 +137,3 @@ if __name__ == "__main__":
 
 
 
-treatments = df['Treatment'].unique()
-print(treatments)
-print(len(df) - 2)
-mean_area = {}
-for treatment in treatments:
-    mean = df.loc[df['Treatment'] == treatment, 'Area'].mean()
-    mean_area[treatment] = mean
-print(mean_area)
