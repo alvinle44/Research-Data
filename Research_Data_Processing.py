@@ -71,7 +71,7 @@ class Treatment:
                     break
 
 
-    def get_averages(self, column_name, grouping):
+    def get_averages(self, column_name, grouping, data_visual):
         if column_name not in Treatment.DATA_COLUMNS:
             return False
         # sort treatments and age into either x or y axis 
@@ -95,13 +95,21 @@ class Treatment:
                 averages[y_item].append(average)
                 st_dev = self.dataset.loc[((self.dataset[slot_1] == x_item) & (self.dataset[slot_2] == y_item)), column_name].std()
                 st_devs[y_item].append(st_dev)
-        max_value = max(i for v in averages.values() for i in v)
+        if data_visual == 1:
+            self.print_graphs(averages, st_devs, x_axis, column_name)
+        elif data_visual == 2:
+            self.print_df(averages, st_devs, x_axis, column_name)
+
+
+
+    def print_graphs(self, ave , stdev, x_axis, column_name):
+        max_value = max(i for v in ave.values() for i in v)
         graph = np.arange(len(x_axis))
         width = 0.15
         multiplier = 0
 
         fig, ax = plt.subplots(layout='constrained')
-        for attribute, measurement in averages.items():
+        for attribute, measurement in ave.items():
             offset = width * multiplier
             rects = ax.bar(graph + offset, measurement, width, label=attribute)
             ax.bar_label(rects, padding=3)
@@ -111,15 +119,12 @@ class Treatment:
         ax.set_xticks(graph + width, x_axis)
         ax.legend(loc='upper left', ncols=3)
         ax.set_ylim(0, max_value + 100)
-
         plt.show()
 
+    def print_df(self, ave, stdev, x_axis, column_name):
+        df = pd.DataFrame.from_dict(ave, orient='index', columns=x_axis)
+        print(df)
 
-    def print_graphs(self, ave , stdev):
-        pass
-
-    def print_df(self):
-        print(self.dataset)            
 
 def abstract_data(filename):
     go = True
@@ -143,7 +148,7 @@ def abstract_data(filename):
         return False
     
 
-def present_graph(datafile):
+def present_data(datafile):
     """
     Present all of the cleaned data in a graph with treatments grouped up and age as well.
     Can also present just the values of the averages of each treatment group and age group. 
@@ -155,9 +160,10 @@ def present_graph(datafile):
         except ValueError:
             print("Type a valid number as instructed for data visualization.")
         column_data = input("Type Area, Mean, or IntDen for data display. Quit to exit. ")
+        graph_or_dataframe = int(input("Would you like the data as a graph or a chart? Select 1 or 2 respectively. "))
         if column_data == 'Quit':
             break
-        datafile.get_averages(column_data, graph_rep)
+        datafile.get_averages(column_data, graph_rep, graph_or_dataframe)
         break
         
     
@@ -190,7 +196,7 @@ def main():
         elif menu_choice == 2:
             print_treatments_ages(new_set)
         elif menu_choice == 3:
-            present_graph(new_set)
+            present_data(new_set)
         elif menu_choice == 4:
             break
         else:
@@ -200,3 +206,6 @@ def main():
 if __name__ == "__main__":
     """Call on function main."""
     main()
+
+#implement the stdev and then clean it up so there ar no errors that can occur
+#go over imlplementation of clean data function as well and then add a count as well  
