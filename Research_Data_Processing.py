@@ -78,7 +78,7 @@ class Treatment:
         if grouping ==  1:
             x_axis, y_axis = tuple(self.treatment), tuple(self.ages)
             slot_1, slot_2  = "Treatment", "Age Group"
-        else:
+        elif grouping == 2:
             x_axis, y_axis = tuple(self.ages), tuple(self.treatment)
             slot_1, slot_2 = "Age Group", "Treatment"
         #columns are by age group 
@@ -95,6 +95,7 @@ class Treatment:
                 averages[y_item].append(average)
                 st_dev = self.dataset.loc[((self.dataset[slot_1] == x_item) & (self.dataset[slot_2] == y_item)), column_name].std()
                 st_devs[y_item].append(st_dev)
+        max_value = max(i for v in averages.values() for i in v)
         graph = np.arange(len(x_axis))
         width = 0.15
         multiplier = 0
@@ -109,7 +110,7 @@ class Treatment:
         ax.set_title(self.name)
         ax.set_xticks(graph + width, x_axis)
         ax.legend(loc='upper left', ncols=3)
-        ax.set_ylim(0, 300)
+        ax.set_ylim(0, max_value + 100)
 
         plt.show()
 
@@ -150,13 +151,14 @@ def present_graph(datafile):
     while True:
         try:
             graph_rep = int(input("Indicate what grouping you would like to visualize by either typing" 
-                            " 1 for grouping by age group or 2 for grouping by treatment group. "))
+                            " 1 for grouping by treatment group or 2 for grouping by age group. "))
         except ValueError:
             print("Type a valid number as instructed for data visualization.")
-        column_data = input("Type Area, Mean, or IntDen for data display. ")
+        column_data = input("Type Area, Mean, or IntDen for data display. Quit to exit. ")
+        if column_data == 'Quit':
+            break
         datafile.get_averages(column_data, graph_rep)
-        
-    
+        break
         
     
 
